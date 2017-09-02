@@ -115,9 +115,14 @@ define python::pip (
     default  => $virtualenv,
   }
 
+  $pip_executable = $::python::version ? {
+    /^(python)?3/ => 'pip3',
+    default => 'pip'
+  }
+
   $pip_env = $virtualenv ? {
-    'system' => "${exec_prefix}pip",
-    default  => "${exec_prefix}${virtualenv}/bin/pip",
+    'system' => "${exec_prefix}${pip_executable}",
+    default  => "${exec_prefix}${virtualenv}/bin/${pip_executable}",
   }
 
   $pypi_index = $index ? {
@@ -228,7 +233,7 @@ define python::pip (
           path        => $path,
         }
       }
-# 
+#
       present: {
         # Whatever version is available.
         exec { "pip_install_${name}":
